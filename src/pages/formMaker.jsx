@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Trash, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 export default function FormConstructorPage() {
   const questionStructure = {
     id: crypto.randomUUID(),
     title: "",
-    description:"",
+    description: "",
     fields: [
       {
         id: crypto.randomUUID(),
@@ -124,10 +125,6 @@ export default function FormConstructorPage() {
     }));
   }
 
-  function saveDocument() {
-    console.log(document);
-  }
-
   function toggleRequired(questionId) {
     setDocument((prev) => ({
       ...prev,
@@ -139,10 +136,31 @@ export default function FormConstructorPage() {
     }));
   }
 
-  function addDescription(text){
-    setDocument((prev)=> ({
-      ...prev, description:text
-    }))
+  function addDescription(text) {
+    setDocument((prev) => ({
+      ...prev,
+      description: text,
+    }));
+  }
+
+  async function saveDocument() {
+    console.log(document);
+
+    try {
+      const { error, data } = await supabase.from("Forms").insert({
+        Title: document.title,
+        Definition: document.description,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      window.alert("Form successfully uploaded");
+    } catch (error) {
+      console.log(error);
+      window.alert("problem processing request");
+    }
   }
 
   return (
@@ -155,9 +173,11 @@ export default function FormConstructorPage() {
         ></input>
       </div>
       <div className="border-2 p-2 m-2">
-        <textarea className="w-full overflow-auto  " placeholder="add a description" onChange={(e)=> addDescription(e.target.value)}>
-
-        </textarea>
+        <textarea
+          className="w-full overflow-auto  "
+          placeholder="add a description"
+          onChange={(e) => addDescription(e.target.value)}
+        ></textarea>
       </div>
       {document.fields.map((question) => (
         <div

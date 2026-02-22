@@ -1,18 +1,23 @@
-import { travelAuthorizationForm } from "../testdata/formLib";
+import { customForm, travelAuthorizationForm } from "../testdata/formLib";
 import FormlessForm from "../components/dyForm";
 import { useState } from "react";
 export default function FormView() {
   const [answered, setAnswered] = useState(false);
   function submitResponse() {
     window.alert("Your'e answer has been recorded thank you");
-    setAnswered(true);
+    console.log(response);
   }
+
+  const [response, setResponse] = useState({});
 
   return (
     <div>
       {!answered ? (
         <div className="font-mono text-black p-4 w-1/2 place-self-center mt-20 flex flex-col">
-          <FormlessForm formDefinition={travelAuthorizationForm}></FormlessForm>
+          <FormlessForm
+            formDefinition={customForm}
+            setResponse={setResponse}
+          ></FormlessForm>
 
           <button
             className="border-2 p-2 rounded-2xl self-end hover:scale-105"
