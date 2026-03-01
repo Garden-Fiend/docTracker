@@ -146,14 +146,33 @@ export default function FormConstructorPage() {
   async function saveDocument() {
     console.log(document);
 
+  
+
+    const formatted = document.fields.map((question) => ({
+      id: question.id,
+      QuestionText: question.label,
+      Type: question.type,
+      Required: question.required,
+      FormId:document.id
+    }));
+
     try {
       const { error, data } = await supabase.from("Forms").insert({
+        id: document.id,
         Title: document.title,
         Definition: document.description,
       });
 
       if (error) {
         throw error;
+      }
+
+      const { error: questionError, data: questionData } = await supabase
+        .from("Questions")
+        .insert(formatted);
+
+      if (questionError) {
+        throw questionError;
       }
 
       window.alert("Form successfully uploaded");
