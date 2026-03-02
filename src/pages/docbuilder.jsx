@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   travelAuthorizationForm,
   documentRequestForm,
@@ -8,12 +8,60 @@ import {
 import FormlessForm from "../components/dyForm";
 import { useNavigate } from "react-router-dom";
 import { FileText } from "lucide-react";
+import { supabase } from "../lib/supabase";
 export default function DocumentBuilderPage() {
   const [docType, setDocType] = useState();
   const navigate = useNavigate();
+  const [formlist, setFormList] = useState(null);
+  const [currentForm,setCurrentForm] = useState();
 
   function toggleDocType(type) {
     setDocType(type);
+  }
+
+  useEffect(() => {
+    async function getForms() {
+      const { error, data } = await supabase.from("Forms").select("*");
+
+      if (error) {
+        console.log(error);
+        return;
+      }
+
+      console.log(data);
+      setFormList(data);
+    }
+
+    reconstructForm();
+  }, []);
+
+  async function reconstructForm() {
+    const { data: formdata } = await supabase.from("Forms").select("*");
+    const { error, data } = await supabase.from("Questions").select("*");
+    const { data: optiondata } = await supabase.from("Options").select("*");
+
+    console.log(formdata);
+    console.log(data);
+    console.log(optiondata);
+
+    const barelyConstructed = {
+      id: formdata[0].id,
+      title: formdata[0].Title,
+      fields: data,
+    };
+
+    const optsToQuest = barelyConstructed.fields.map((question) => ({
+      ...question,
+      options: optiondata.filter((option) => option.QuestionId === question.id),
+    }));
+
+    const finalBuild = {
+      id: barelyConstructed.id,
+      title: barelyConstructed.title,
+      fields: optsToQuest,
+    };
+
+    console.log(finalBuild);
   }
 
   return (
@@ -34,11 +82,14 @@ export default function DocumentBuilderPage() {
               className="border-2 p-2 w-full text-black"
               onChange={(e) => toggleDocType(e.target.value)}
             >
-              <option value="Select">Select Type</option>
-              <option value="Type A">Type A</option>
-              <option value="Type B">Type B </option>
-              <option value="Type C">Type C</option>
-              <option value="Custom Type">Custom Type</option>
+              <option value="select">Select</option>
+              <option value="Type B">Type B</option>
+              {formlist &&
+                formlist.map((form) => (
+                  <option value={form.id} key={form.id}>
+                    {form.Title}
+                  </option>
+                ))}
             </select>
           </div>
           <div>
@@ -64,9 +115,9 @@ export default function DocumentBuilderPage() {
               formDefinition={travelAuthorizationForm}
             ></FormlessForm>
           )}
-          {docType === "Custom Type" && <FormlessForm
-          formDefinition={customForm}
-          ></FormlessForm>}
+          {docType === "Custom Type" && (
+            <FormlessForm formDefinition={customForm}></FormlessForm>
+          )}
 
           {docType !== "Select" && (
             <div className="flex gap-2  p-4 place-self-end">

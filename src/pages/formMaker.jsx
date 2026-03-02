@@ -148,13 +148,21 @@ export default function FormConstructorPage() {
 
   
 
-    const formatted = document.fields.map((question) => ({
+    const formattedQuestions = document.fields.map((question) => ({
       id: question.id,
       QuestionText: question.label,
       Type: question.type,
       Required: question.required,
       FormId:document.id
     }));
+
+    const formattedOptions = document.fields.flatMap((question)=> question.options.map((option)=> ({
+      id: option.id,
+      OptionText: option.text,
+      QuestionId: question.id
+    })));
+
+    console.log(formattedOptions);
 
     try {
       const { error, data } = await supabase.from("Forms").insert({
@@ -169,10 +177,16 @@ export default function FormConstructorPage() {
 
       const { error: questionError, data: questionData } = await supabase
         .from("Questions")
-        .insert(formatted);
+        .insert(formattedQuestions);
 
       if (questionError) {
         throw questionError;
+      }
+
+      const {error:optionError,data:optionData} = await supabase.from("Options").insert(formattedOptions);
+
+      if(optionError){
+        throw optionError;
       }
 
       window.alert("Form successfully uploaded");

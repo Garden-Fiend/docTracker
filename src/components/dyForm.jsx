@@ -8,7 +8,7 @@ export default function FormlessForm({ formDefinition, setResponse }) {
         <div className="flex flex-col p-2" key={field.id}>
           <label>{field.label}</label>
 
-          {field.type === "paragraph" && <p>{field.text}</p>}
+          {field.type === "paragraph" && <p>{field.text||field.QuestionText}</p>}
 
           {field.type === "text" && (
             <input
@@ -47,7 +47,7 @@ export default function FormlessForm({ formDefinition, setResponse }) {
               }
             >
               {field.options.map((option) => (
-                <option>{option.label || option.text}</option>
+                <option>{option.label || option.text ||option.OptionText}</option>
               ))}
             </select>
           )}
