@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Link2, Search, SendHorizonal, Trash } from "lucide-react";
 export default function TableComponent({ headerContent, bodyContent}) {
 
  
@@ -12,6 +12,7 @@ export default function TableComponent({ headerContent, bodyContent}) {
             {headerContent.map((header) => (
               <th className="p-2">{header}</th>
             ))}
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -20,8 +21,17 @@ export default function TableComponent({ headerContent, bodyContent}) {
               {Object.values(data).map((cell) => (
                 <td className="p-4 border-2">{cell}</td>
               ))}
+              <td className="p-4 border-2">
+                <div className="flex gap-2">
+                  <Trash></Trash>
+                  <Link2></Link2>
+                  <SendHorizonal></SendHorizonal>
+                </div>
+              </td>
             </tr>
           ))}
+          
+          
         </tbody>
       </table>
     </div>

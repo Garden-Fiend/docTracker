@@ -1,13 +1,35 @@
 import { Search } from "lucide-react";
 import TableComponent from "../components/table";
-import { mockDocuments } from "../testdata/mockdata";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import { useEffect, useState } from "react";
 export default function MainTablePage() {
   const navigate = useNavigate();
+  const [formlist, setFormList] = useState();
 
   function createDocument() {
-    navigate("/DocBuilder")
+    navigate("/DocBuilder");
   }
+
+  useEffect(() => {
+    async function getForms() {
+      const { error, data } = await supabase.from("Forms").select("*");
+
+      if (error) {
+        console.log(error);
+        return;
+      }
+
+      setFormList(data);
+      
+    }
+
+    getForms();
+  },[]);
+
+  console.log(formlist);
+
+
   return (
     <div className="text-black font-mono h-dvh flex flex-col mt-10">
       <p className=" text-center text-2xl font-bold fixed top-0 place-self-center w-full bg-[#ecebd3] z-100 p-4">
@@ -53,19 +75,11 @@ export default function MainTablePage() {
             </button>
           </div>
         </div>
-        <TableComponent
-          headerContent={[
-            "ID",
-            "Title",
-            "Type",
-            "Date Sent",
-            "Deadline",
-            "Status",
-            "Response",
-          ]}
-          bodyContent={mockDocuments}
+       {formlist && <TableComponent
+          headerContent={Object.keys(formlist[0]).map((headerCells)=> headerCells)}
+          bodyContent={formlist}
         ></TableComponent>
-      </div>
+      }</div>
     </div>
   );
 }

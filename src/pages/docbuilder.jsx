@@ -1,22 +1,21 @@
 import { useEffect, useState } from "react";
-import {
-  travelAuthorizationForm,
-  documentRequestForm,
-  contactForm,
-  customForm,
-} from "../testdata/formLib";
 import FormlessForm from "../components/dyForm";
 import { useNavigate } from "react-router-dom";
 import { FileText } from "lucide-react";
 import { supabase } from "../lib/supabase";
 export default function DocumentBuilderPage() {
-  const [docType, setDocType] = useState();
   const navigate = useNavigate();
   const [formlist, setFormList] = useState(null);
-  const [currentForm,setCurrentForm] = useState();
+  const [currentForm, setCurrentForm] = useState();
 
-  function toggleDocType(type) {
-    setDocType(type);
+  async function toggleDocType(formId) {
+    if (formId === "select") {
+      setCurrentForm(null);
+      return;
+    }
+    console.log(formId);
+
+    setCurrentForm(await reconstructForm(formId));
   }
 
   useEffect(() => {
@@ -32,36 +31,64 @@ export default function DocumentBuilderPage() {
       setFormList(data);
     }
 
-    reconstructForm();
+    getForms();
   }, []);
 
-  async function reconstructForm() {
-    const { data: formdata } = await supabase.from("Forms").select("*");
-    const { error, data } = await supabase.from("Questions").select("*");
-    const { data: optiondata } = await supabase.from("Options").select("*");
+  async function reconstructForm(formId) {
+    try {
+      const { data: formdata, error: formError } = await supabase
+        .from("Forms")
+        .select("*")
+        .eq("id", formId);
+      if (formError) {
+        console.log(formError);
+        throw error;
+      }
 
-    console.log(formdata);
-    console.log(data);
-    console.log(optiondata);
+      const { error, data } = await supabase
+        .from("Questions")
+        .select("*")
+        .eq("FormId", formId);
+      if (error) {
+        console.log(error);
+        throw error;
+      }
+      const { data: optiondata, error: optionError } = await supabase
+        .from("Options")
+        .select("*");
 
-    const barelyConstructed = {
-      id: formdata[0].id,
-      title: formdata[0].Title,
-      fields: data,
-    };
+      if (optionError) {
+        console.log(optionError);
+        throw optionError;
+      }
 
-    const optsToQuest = barelyConstructed.fields.map((question) => ({
-      ...question,
-      options: optiondata.filter((option) => option.QuestionId === question.id),
-    }));
+      console.log(formdata);
+      console.log(data);
+      console.log(optiondata);
 
-    const finalBuild = {
-      id: barelyConstructed.id,
-      title: barelyConstructed.title,
-      fields: optsToQuest,
-    };
+      const barelyConstructed = {
+        id: formdata[0].id,
+        title: formdata[0].Title,
+        fields: data,
+      };
 
-    console.log(finalBuild);
+      const optsToQuest = barelyConstructed.fields.map((question) => ({
+        ...question,
+        options: optiondata.filter(
+          (option) => option.QuestionId === question.id,
+        ),
+      }));
+
+      const finalBuild = {
+        id: barelyConstructed.id,
+        title: barelyConstructed.title,
+        fields: optsToQuest,
+      };
+
+      return finalBuild;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -83,7 +110,6 @@ export default function DocumentBuilderPage() {
               onChange={(e) => toggleDocType(e.target.value)}
             >
               <option value="select">Select</option>
-              <option value="Type B">Type B</option>
               {formlist &&
                 formlist.map((form) => (
                   <option value={form.id} key={form.id}>
@@ -104,22 +130,9 @@ export default function DocumentBuilderPage() {
         </div>
 
         <div className="w-1/2 place-self-center border-2">
-          {docType === "Type A" && (
-            <FormlessForm formDefinition={contactForm}></FormlessForm>
-          )}
-          {docType === "Type B" && (
-            <FormlessForm formDefinition={documentRequestForm}></FormlessForm>
-          )}
-          {docType === "Type C" && (
-            <FormlessForm
-              formDefinition={travelAuthorizationForm}
-            ></FormlessForm>
-          )}
-          {docType === "Custom Type" && (
-            <FormlessForm formDefinition={customForm}></FormlessForm>
-          )}
-
-          {docType !== "Select" && (
+          {currentForm ? (
+            <FormlessForm formDefinition={currentForm}></FormlessForm>
+          ) : (
             <div className="flex gap-2  p-4 place-self-end">
               <button
                 onClick={() => navigate("/MainTable")}
