@@ -13,7 +13,7 @@ function App() {
       <Route path="/" element={<LoginPage />} />
       <Route path="/MainTable" element={<MainTablePage />} />
       <Route path="/DocBuilder" element={<DocumentBuilderPage />} />
-      <Route path="/FormView" element={<FormView />} />
+      <Route path="/FormView/:formId" element={<FormView />} />
       <Route path="/FormBuilder" element={<FormConstructorPage />}></Route>
     </Routes>
   );

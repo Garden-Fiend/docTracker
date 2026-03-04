@@ -1,5 +1,10 @@
 import { Link2, Search, SendHorizonal, Trash } from "lucide-react";
-export default function TableComponent({ headerContent, bodyContent}) {
+export default function TableComponent({ headerContent, bodyContent,setModal,setCurrentLink}) {
+
+  function generateLink(id){
+    setCurrentLink(`${window.location.origin}/FormView/${id}`);
+    setModal(true);
+  }
 
  
   return (
@@ -10,21 +15,21 @@ export default function TableComponent({ headerContent, bodyContent}) {
         <thead className="bg-red-900 text-yellow-50 sticky">
           <tr>
             {headerContent.map((header) => (
-              <th className="p-2">{header}</th>
+              <th className="p-2" key={header}>{header}</th>
             ))}
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {bodyContent.map((data) => (
-            <tr>
+            <tr key={data.id}>
               {Object.values(data).map((cell) => (
-                <td className="p-4 border-2">{cell}</td>
+                <td className="p-4 border-2" key={cell}>{cell}</td>
               ))}
               <td className="p-4 border-2">
                 <div className="flex gap-2">
                   <Trash></Trash>
-                  <Link2></Link2>
+                  <Link2 className="hover:scale-105" onClick={()=> generateLink(data.id)}></Link2>
                   <SendHorizonal></SendHorizonal>
                 </div>
               </td>

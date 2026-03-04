@@ -1,14 +1,26 @@
-import { Search } from "lucide-react";
+import { Link2, Search, X } from "lucide-react";
 import TableComponent from "../components/table";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useEffect, useState } from "react";
+
 export default function MainTablePage() {
   const navigate = useNavigate();
+  const [modal, setModal] = useState(false);
+  const [currentLink, setCurrentLink] = useState();
   const [formlist, setFormList] = useState();
 
   function createDocument() {
     navigate("/DocBuilder");
+  }
+
+  async function copyToClip(link) {
+    try {
+      await navigator.clipboard.writeText(link);
+      window.alert("Link Copied");
+    } catch (error) {
+      window.alert(error);
+    }
   }
 
   useEffect(() => {
@@ -21,14 +33,12 @@ export default function MainTablePage() {
       }
 
       setFormList(data);
-      
     }
 
     getForms();
-  },[]);
+  }, []);
 
   console.log(formlist);
-
 
   return (
     <div className="text-black font-mono h-dvh flex flex-col mt-10">
@@ -75,11 +85,30 @@ export default function MainTablePage() {
             </button>
           </div>
         </div>
-       {formlist && <TableComponent
-          headerContent={Object.keys(formlist[0]).map((headerCells)=> headerCells)}
-          bodyContent={formlist}
-        ></TableComponent>
-      }</div>
+        {modal && (
+          <div className="fixed z-100 border-2 bg-white place-self-center top-100 w-[60%]">
+            <div className="flex items-center bg-red-900 justify-between p-2">
+              <p className="bg-red-900 text-amber-50">Share this Document</p>
+              <X className="text-amber-50" onClick={() => setModal(false)}></X>
+            </div>
+
+            <div className="flex items-center justify-between p-2">
+              <p>{currentLink}</p>
+              <Link2 onClick={() => copyToClip(currentLink)}></Link2>
+            </div>
+          </div>
+        )}
+        {formlist && (
+          <TableComponent
+            setModal={setModal}
+            setCurrentLink={setCurrentLink}
+            headerContent={Object.keys(formlist[0]).map(
+              (headerCells) => headerCells,
+            )}
+            bodyContent={formlist}
+          ></TableComponent>
+        )}
+      </div>
     </div>
   );
 }
