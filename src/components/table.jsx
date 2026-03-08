@@ -1,10 +1,12 @@
 import { Link2, Search, SendHorizonal, Trash } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 export default function TableComponent({ headerContent, bodyContent,setModal,setCurrentLink}) {
-
   function generateLink(id){
     setCurrentLink(`${window.location.origin}/FormView/${id}`);
     setModal(true);
   }
+
+  const navigate = useNavigate();
 
  
   return (
@@ -23,8 +25,12 @@ export default function TableComponent({ headerContent, bodyContent,setModal,set
         <tbody>
           {bodyContent.map((data) => (
             <tr key={data.id}>
-              {Object.values(data).map((cell) => (
-                <td className="p-4 border-2" key={cell}>{cell}</td>
+              {Object.entries(data).map(([column,cell]) => (
+                <td className="p-4 border-2" key={cell} onClick={()=>{
+                  if(column != "Responses") {return}
+                  
+                  navigate(`/Responses/${data.id}`)
+                }}>{cell}</td>
               ))}
               <td className="p-4 border-2">
                 <div className="flex gap-2">

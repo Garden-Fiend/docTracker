@@ -7,6 +7,7 @@ import MainTablePage from "./pages/mainDB";
 import DocumentBuilderPage from "./pages/docbuilder";
 import FormView from "./pages/formview";
 import FormConstructorPage from "./pages/formmaker";
+import ResponsesTable from "./pages/responseTable";
 function App() {
   return (
     <Routes>
@@ -15,6 +16,7 @@ function App() {
       <Route path="/DocBuilder" element={<DocumentBuilderPage />} />
       <Route path="/FormView/:formId" element={<FormView />} />
       <Route path="/FormBuilder" element={<FormConstructorPage />}></Route>
+      <Route path="/Responses/:formId" element={<ResponsesTable/>}></Route>
     </Routes>
   );
 }
