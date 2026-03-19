@@ -1,5 +1,12 @@
-import { Search } from "lucide-react";
-export default function TableComponent({ headerContent, bodyContent}) {
+import { Link2, Search, SendHorizonal, Trash } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+export default function TableComponent({ headerContent, bodyContent,setModal,setCurrentLink}) {
+  function generateLink(id){
+    setCurrentLink(`${window.location.origin}/FormView/${id}`);
+    setModal(true);
+  }
+
+  const navigate = useNavigate();
 
  
   return (
@@ -10,18 +17,32 @@ export default function TableComponent({ headerContent, bodyContent}) {
         <thead className="bg-red-900 text-yellow-50 sticky">
           <tr>
             {headerContent.map((header) => (
-              <th className="p-2">{header}</th>
+              <th className="p-2" key={header}>{header}</th>
             ))}
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {bodyContent.map((data) => (
-            <tr>
-              {Object.values(data).map((cell) => (
-                <td className="p-4 border-2">{cell}</td>
+            <tr key={data.id}>
+              {Object.entries(data).map(([column,cell]) => (
+                <td className="p-4 border-2" key={cell} onClick={()=>{
+                  if(column != "Responses") {return}
+                  
+                  navigate(`/Responses/${data.id}`)
+                }}>{cell}</td>
               ))}
+              <td className="p-4 border-2">
+                <div className="flex gap-2">
+                  <Trash></Trash>
+                  <Link2 className="hover:scale-105" onClick={()=> generateLink(data.id)}></Link2>
+                  <SendHorizonal></SendHorizonal>
+                </div>
+              </td>
             </tr>
           ))}
+          
+          
         </tbody>
       </table>
     </div>

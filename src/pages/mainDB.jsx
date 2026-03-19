@@ -1,13 +1,45 @@
-import { Search } from "lucide-react";
+import { Link2, Search, X } from "lucide-react";
 import TableComponent from "../components/table";
-import { mockDocuments } from "../testdata/mockdata";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import { useEffect, useState } from "react";
+
 export default function MainTablePage() {
   const navigate = useNavigate();
+  const [modal, setModal] = useState(false);
+  const [currentLink, setCurrentLink] = useState();
+  const [formlist, setFormList] = useState();
 
   function createDocument() {
-    navigate("/DocBuilder")
+    navigate("/DocBuilder");
   }
+
+  async function copyToClip(link) {
+    try {
+      await navigator.clipboard.writeText(link);
+      window.alert("Link Copied");
+    } catch (error) {
+      window.alert(error);
+    }
+  }
+
+  useEffect(() => {
+    async function getForms() {
+      const { error, data } = await supabase.from("Forms").select("*");
+
+      if (error) {
+        console.log(error);
+        return;
+      }
+
+      setFormList(data);
+    }
+
+    getForms();
+  }, []);
+
+  console.log(formlist);
+
   return (
     <div className="text-black font-mono h-dvh flex flex-col mt-10">
       <p className=" text-center text-2xl font-bold fixed top-0 place-self-center w-full bg-[#ecebd3] z-100 p-4">
@@ -53,18 +85,29 @@ export default function MainTablePage() {
             </button>
           </div>
         </div>
-        <TableComponent
-          headerContent={[
-            "ID",
-            "Title",
-            "Type",
-            "Date Sent",
-            "Deadline",
-            "Status",
-            "Response",
-          ]}
-          bodyContent={mockDocuments}
-        ></TableComponent>
+        {modal && (
+          <div className="fixed z-100 border-2 bg-white place-self-center top-100 w-[60%]">
+            <div className="flex items-center bg-red-900 justify-between p-2">
+              <p className="bg-red-900 text-amber-50">Share this Document</p>
+              <X className="text-amber-50" onClick={() => setModal(false)}></X>
+            </div>
+
+            <div className="flex items-center justify-between p-2">
+              <p>{currentLink}</p>
+              <Link2 onClick={() => copyToClip(currentLink)}></Link2>
+            </div>
+          </div>
+        )}
+        {formlist && (
+          <TableComponent
+            setModal={setModal}
+            setCurrentLink={setCurrentLink}
+            headerContent={Object.keys(formlist[0]).map(
+              (headerCells) => headerCells,
+            )}
+            bodyContent={formlist}
+          ></TableComponent>
+        )}
       </div>
     </div>
   );

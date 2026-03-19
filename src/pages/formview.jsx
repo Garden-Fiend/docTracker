@@ -1,23 +1,132 @@
 import { customForm, travelAuthorizationForm } from "../testdata/formLib";
 import FormlessForm from "../components/dyForm";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 export default function FormView() {
+  const { formId } = useParams();
+  const [currentForm, setCurrentForm] = useState();
   const [answered, setAnswered] = useState(false);
-  function submitResponse() {
-    window.alert("Your'e answer has been recorded thank you");
-    console.log(response);
+
+  async function reconstructForm(formId) {
+    try {
+      const { data: formdata, error: formError } = await supabase
+        .from("Forms")
+        .select("*")
+        .eq("id", formId);
+      if (formError) {
+        console.log(formError);
+        throw error;
+      }
+
+      const { error, data } = await supabase
+        .from("Questions")
+        .select("*")
+        .eq("FormId", formId);
+      if (error) {
+        console.log(error);
+        throw error;
+      }
+      const { data: optiondata, error: optionError } = await supabase
+        .from("Options")
+        .select("*");
+
+      if (optionError) {
+        console.log(optionError);
+        throw optionError;
+      }
+
+      console.log(formdata);
+      console.log(data);
+      console.log(optiondata);
+
+      const barelyConstructed = {
+        id: formdata[0].id,
+        title: formdata[0].Title,
+        fields: data,
+      };
+
+      const optsToQuest = barelyConstructed.fields.map((question) => ({
+        ...question,
+        options: optiondata.filter(
+          (option) => option.QuestionId === question.id,
+        ),
+      }));
+
+      const finalBuild = {
+        id: barelyConstructed.id,
+        title: barelyConstructed.title,
+        fields: optsToQuest,
+      };
+
+      setCurrentForm(finalBuild);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  const [response, setResponse] = useState({});
+  useEffect(() => {
+    reconstructForm(formId);
+  }, []);
+
+  async function submitResponse() {
+    try {
+      const resId = crypto.randomUUID();
+
+      const finalResponse = Object.entries(response)
+        .filter(([id, value]) => id != "form")
+        .map(([questionId, answer]) => ({
+          id: crypto.randomUUID(),
+          QuestionId: questionId,
+          ResponseValue: answer,
+          FormId: response.form,
+          ResponderId: resId,
+        }));
+
+      const { error, data } = await supabase
+        .from("Responses")
+        .insert(finalResponse)
+        .select();
+
+      if (error) {
+        throw error;
+      }
+
+      console.log(data);
+
+      const { error: incrementError, data: incrementData } = await supabase.rpc(
+        "incrementresponse",
+        {
+          formid: response.form,
+        },
+      );
+
+      if (incrementError) {
+        throw incrementError;
+      }
+
+      window.alert("Response Uploaded");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const [response, setResponse] = useState({ form: formId });
 
   return (
     <div>
       {!answered ? (
         <div className="font-mono text-black p-4 w-1/2 place-self-center mt-20 flex flex-col">
-          <FormlessForm
-            formDefinition={customForm}
-            setResponse={setResponse}
-          ></FormlessForm>
+          {currentForm ? (
+            <FormlessForm
+              formDefinition={currentForm}
+              setResponse={setResponse}
+            ></FormlessForm>
+          ) : (
+            <div className="animate-bounce">
+              <p>010</p>
+            </div>
+          )}
 
           <button
             className="border-2 p-2 rounded-2xl self-end hover:scale-105"

@@ -124,3 +124,85 @@ export const customForm = {
   ],
   responses: []
 };
+
+const reconstructedForm = {
+  id: "c4a7e1c4-89c1-46c6-8116-f885f08e7f7a",
+  title: "Test Document",
+  fields: [
+    {
+      QuestionText: "What is your name?",
+      Type: "text",
+      Required: true,
+      created_at: "2026-03-02T13:49:25.159496+00:00",
+      id: "e6d641d5-e320-4fa0-ba02-b9d49475888a",
+      FormId: "c4a7e1c4-89c1-46c6-8116-f885f08e7f7a",
+      options: [
+        {
+          OptionText: "",
+          created_at: "2026-03-02T13:49:25.392156+00:00",
+          QuestionId: "e6d641d5-e320-4fa0-ba02-b9d49475888a",
+          id: "b6cb02cb-5b08-41ba-b28b-b773b245ef79"
+        }
+      ]
+    },
+    {
+      QuestionText: "Choose a pokemon",
+      Type: "radio",
+      Required: true,
+      created_at: "2026-03-02T13:49:25.159496+00:00",
+      id: "c8cb26a3-3082-4380-acef-dce547c2ed34",
+      FormId: "c4a7e1c4-89c1-46c6-8116-f885f08e7f7a",
+      options: [
+        {
+          OptionText: "Snorlax",
+          created_at: "2026-03-02T13:49:25.392156+00:00",
+          QuestionId: "c8cb26a3-3082-4380-acef-dce547c2ed34",
+          id: "48382af2-32cc-4594-9e23-9f26bbe6dc98"
+        },
+        {
+          OptionText: "Pikachu",
+          created_at: "2026-03-02T13:49:25.392156+00:00",
+          QuestionId: "c8cb26a3-3082-4380-acef-dce547c2ed34",
+          id: "14c88d89-2c0a-43fa-b3c9-58ca1b9d017d"
+        },
+        {
+          OptionText: "Gengar",
+          created_at: "2026-03-02T13:49:25.392156+00:00",
+          QuestionId: "c8cb26a3-3082-4380-acef-dce547c2ed34",
+          id: "d98a61ac-fda5-4840-8940-98b0cc0b7b29"
+        }
+      ]
+    },
+    {
+      QuestionText: "Pick one",
+      Type: "radio",
+      Required: true,
+      created_at: "2026-03-02T13:49:25.159496+00:00",
+      id: "6ae31706-030a-4d9f-8155-8d13dc50c0af",
+      FormId: "c4a7e1c4-89c1-46c6-8116-f885f08e7f7a",
+      options: [
+        {
+          OptionText: "Breakfast",
+          created_at: "2026-03-02T13:49:25.392156+00:00",
+          QuestionId: "6ae31706-030a-4d9f-8155-8d13dc50c0af",
+          id: "5785954f-c0f9-4f47-9e01-c809e0e438bc"
+        },
+        {
+          OptionText: "Dinner",
+          created_at: "2026-03-02T13:49:25.392156+00:00",
+          QuestionId: "6ae31706-030a-4d9f-8155-8d13dc50c0af",
+          id: "93335663-3dc6-4ce7-97ed-993a7731c7dd"
+        }
+      ]
+    },
+    {
+      QuestionText: "When was your birthday?",
+      Type: "date",
+      Required: true,
+      created_at: "2026-03-02T13:49:25.159496+00:00",
+      id: "88653e76-f2dd-4a72-a72a-19f6d50c7933",
+      FormId: "c4a7e1c4-89c1-46c6-8116-f885f08e7f7a",
+      options: []
+    }
+  ]
+}
