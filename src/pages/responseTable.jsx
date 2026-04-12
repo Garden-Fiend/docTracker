@@ -8,6 +8,8 @@ export default function ResponsesTable() {
   const [questions, setQuestions] = useState();
   const { formId } = useParams();
 
+  // get responses from a certain form based on id
+  
   useEffect(() => {
     async function getResponses() {
       try {
